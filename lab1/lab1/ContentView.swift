@@ -1,4 +1,6 @@
 import SwiftUI
+import CoreLocation
+import MapKit
 
 struct ContentView: View {
     
@@ -14,6 +16,10 @@ struct ContentView: View {
         }
   }
 }
+struct Place: Identifiable {
+        let id = UUID()
+        let coordinate: CLLocationCoordinate2D
+    }
 
 struct WeatherRecordView: View{
     let CELL_HEIGHT :CGFloat = 50
@@ -22,6 +28,23 @@ struct WeatherRecordView: View{
     let VSTACK_X_OFFSET: CGFloat = -20
     var record: WeatherModel.WeatherRecord
     var viewModel: WeatherViewModel
+    @State private var region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 50.0, longitude: 20.0), span: MKCoordinateSpan(latitudeDelta: 1, longitudeDelta: 1))
+    @State private var showingSheet: Bool = false
+    
+    struct SheetView: View{
+        @Environment(\.presentationMode) var presentationMode
+        
+        var body: some View{
+            ZStack{
+                Button("Dismiss"){
+                    presentationMode.wrappedValue.dismiss()
+                }
+            }
+        }
+    }
+    
+    
+    
     var body: some View{
         
         ZStack{
@@ -47,13 +70,31 @@ struct WeatherRecordView: View{
                     }
                     .frame(alignment: .trailing)
                     .padding(.trailing, 10)
+                
+                Text("🔎")
+                    .font(.largeTitle)
+                    .onTapGesture{
+                        showingSheet = true
+                    }
+                    .sheet(isPresented: $showingSheet, content:{ Map(coordinateRegion: $region,annotationItems: [Place(coordinate: .init(latitude: record.latt, longitude: record.long))] )
+                        {_ in SheetView()}
+                        .onAppear()
+            })
+                    .onAppear(perform: {setCoordinates(latt: record.latt, long: record.long)})
+                           
+                    .frame(alignment: .trailing)
+                    .padding(.trailing, 10)
             }
         }
         .frame(height: CELL_HEIGHT)
         //using .frame modifier to set height of element
       
     }
+    func setCoordinates(latt: Double, long: Double){
+        region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: latt, longitude: long), span: MKCoordinateSpan(latitudeDelta: 1, longitudeDelta: 1))}
 }
+
+
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {

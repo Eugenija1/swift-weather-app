@@ -10,16 +10,12 @@ import Combine
 
 class MetaWeatherFeatcher{
     
-    func forecast(forId woeId: String) ->
-        
-        AnyPublisher<MetaWeatherRepsonse, Error>{
-            var url = "https://www.metaweather.com/api/location/" + woeId
-            let url2 = URL(string: url)!
-            //let url2 = URL(string:"https://www.metaweather.com/api/location/2487956")!
-        return URLSession.shared.dataTaskPublisher(for: url2)
+    func forecast(forId woeId: String) -> AnyPublisher<MetaWeatherRepsonse,Error>
+    {
+        let url = URL(string: "https://www.metaweather.com/api/location/\(woeId)")!
+        return URLSession.shared.dataTaskPublisher(for: url)
             .map {$0.data}
             .decode(type: MetaWeatherRepsonse.self, decoder: JSONDecoder())
             .eraseToAnyPublisher()
-        }
-    
+    }
 }
