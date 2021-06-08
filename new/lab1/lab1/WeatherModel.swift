@@ -20,7 +20,9 @@ struct WeatherModel{
             let weatherSt = weather_states[weatherStateCode]!
             let weatherIcon = weather_icons[weatherStateCode]!
             records.append(WeatherRecord(woeId: woeid, cityName: name, icon: weatherIcon, weatherState: weatherSt))
+        
         }
+        
     }
     
     struct WeatherRecord: Identifiable {
@@ -49,14 +51,33 @@ struct WeatherModel{
         print("refreshing record: \(records[index])")
     }
     
-    mutating func refresh2(woeId: String, response:MetaWeatherRepsonse){
+    mutating func refresh2(woeId: String, response:MetaWeatherRepsonse, currentLocation: String, currentName: String){
         var index: Int = -1
+        
+        if (woeId != currentLocation){
+        
         for (ind,rec) in records.enumerated(){
             if rec.woeId == woeId{
+                if(ind == 0){
+                    print("\(ind) should not be 0")
+                    for (ind2, rec2) in records.enumerated(){
+                        if rec2.woeId == currentLocation{
+                            index = ind2
+                            
+                        }
+                    }
+                } else{
                 index = ind
+                }
             }
         }
-        print("index: \(index)")
+        } else{
+            index = 0
+            records[0].cityName = currentCityName
+        }
+        
+        records[index].cityName = response.title
+        print("index \(index)")
         records[index].latt = Double(response.lattLong.components(separatedBy: ",")[0].trimmingCharacters(in: .whitespaces))!
         print(response.lattLong.components(separatedBy: ","))
         records[index].long = Double(response.lattLong.components(separatedBy: ",")[1].trimmingCharacters(in: .whitespaces))!
@@ -66,5 +87,25 @@ struct WeatherModel{
         records[index].windSpeed = response.consolidatedWeather[0].windSpeed
         records[index].windDirection = response.consolidatedWeather[0].windDirection
         print("refresh2 of record: \(records[index])")
+    }
+    var currentCityName: String = ""
+    mutating func refreshLoc(currentCity: String, response: NearestLocationResponse){
+        var index: Int = -1
+        for (ind,rec) in records.enumerated(){
+            if rec.woeId == "0"{
+                index = ind
+                print("current loc index: \(index)")
+                self.currentCityName = currentCity
+                self.currentCityName += " ("
+                self.currentCityName += response[0].title
+                self.currentCityName += ")"
+                print("location near: \(self.currentCityName)")
+                records[index].cityName = self.currentCityName
+                var nearestLatt = Double(response[0].lattLong.components(separatedBy: ",")[0])
+                var nearestLong = Double(response[0].lattLong.components(separatedBy: ",")[1])
+                records[index].latt = nearestLatt!
+                records[index].long = nearestLong!
+                records[index].woeId = String(response[0].woeid)            }
+        }
     }
 }

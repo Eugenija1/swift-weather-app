@@ -23,7 +23,7 @@ struct Place: Identifiable {
 
 struct WeatherRecordView: View{
     let CELL_HEIGHT :CGFloat = 50
-    let CORNER_RADIUS :CGFloat = 25.0
+    let CORNER_RADIUS :CGFloat = 20.0
     let WEATHER_ICON_SCALE :CGFloat = 0.8
     let VSTACK_X_OFFSET: CGFloat = -20
     var record: WeatherModel.WeatherRecord
@@ -55,13 +55,15 @@ struct WeatherRecordView: View{
                     Text(record.icon)
                     .font(.system(size: WEATHER_ICON_SCALE * geometry.size.height))
                     .frame(alignment: .leading)
-                    .padding(.leading, 10)
+                    .padding(.leading, 5)
                 }
                 VStack(alignment: .leading){
                     Text(record.cityName)
                     Text("Temperature:\(record.temperature, specifier: "%.1f")'C")
                         .font(.caption)
-                }.offset(x: VSTACK_X_OFFSET)
+                }
+                .offset(x: VSTACK_X_OFFSET)
+                .frame(width: 120.0)
                 
             
                 Text("🔄")
@@ -70,7 +72,7 @@ struct WeatherRecordView: View{
                         viewModel.refresh(record: record)
                     }
                     .frame(alignment: .trailing)
-                    .padding(.trailing, 10)
+                    //.padding(.trailing, 10)
                 
                 Text("🔎")
                     .font(.largeTitle)
@@ -92,7 +94,7 @@ struct WeatherRecordView: View{
                     //}
             })
                     .frame(alignment: .trailing)
-                    .padding(.trailing, 10)
+                    .padding(.trailing, 5)
             }
         }
         .frame(height: CELL_HEIGHT)
