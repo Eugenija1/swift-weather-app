@@ -10,7 +10,7 @@ import Combine
 import CoreLocation
 
 class WeatherViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
-    @Published private var model: WeatherModel = WeatherModel(cities: ["0": "Current Location", "2459115": "New York", "2442047": "Los Angeles", "4118": "Toronto", "2295019": "New Delhi", "1105779": "Sydney", "44418": "London", "638243": "Berlin", "766273": "Madrid", "721943": "Rome", "615702": "Paris"])
+    @Published private var model: WeatherModel = WeatherModel(cities: ["0": "Current Location", "2459115": "New York", "2442047": "Los Angeles", "4118": "Toronto", "2487956": "San Francisco", "1105779": "Sydney", "44418": "London", "638242": "Berlin", "766273": "Madrid", "721943": "Rome", "615702": "Paris"])
     var records: Array<WeatherModel.WeatherRecord>{
         model.records
     }
@@ -21,6 +21,7 @@ class WeatherViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
     private let locationManager: CLLocationManager
     @Published var nearestWoeid : String = "0"
     @Published var currentLocation: CLLocation?
+    private var curLocStr: String = ""
     @Published var currentLocName: String = "City Name"
     
     func fetchWeather(forId woeid: String){
@@ -30,7 +31,7 @@ class WeatherViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
                 }, receiveValue: { value in
                     //print(value)
                     
-                    self.model.refresh2(woeId: woeid, response: value, currentLocation: self.nearestWoeid, currentName: self.currentLocName)
+                    self.model.refresh2(woeId: woeid, response: value, currentLocation: self.nearestWoeid, currentName: self.currentLocName, currentCoor: self.curLocStr)
                 })
                 .store(in: &cancellables)
     }
@@ -39,10 +40,11 @@ class WeatherViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
         locationSearcher.forecast(forId: coordinates)
             .sink(receiveCompletion: {completion in print(completion)},
                   receiveValue: {value in //self.appendFirstWoeid(response: value)
-                    self.model.refreshLoc(currentCity: self.currentLocName, response: value)
+                    self.model.refreshLoc(currentCity: self.currentLocName, currentCoord: self.curLocStr, response: value)
+                    
                     self.nearestWoeid = String(value[0].woeid)
                     self.fetchWeather(forId:self.nearestWoeid)
-                    print("recieved nearest loc: \(value)")
+                    print("recieved nearest loc: \(self.currentLocName)")
                   })
             .store(in: &cancellables2)
     }
@@ -93,11 +95,11 @@ class WeatherViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
     }
 
     func refreshCurrentLoc() {
-        var str = String(currentLocation?.coordinate.latitude ?? 50.0)
-        str += ","
-        str += String(currentLocation?.coordinate.longitude ?? 20.0)
-        print("coordinates: \(str)")
-        fetchNearestLocation(forId: str)
+        curLocStr = String(currentLocation?.coordinate.latitude ?? 50.0)
+        curLocStr += ","
+        curLocStr += String(currentLocation?.coordinate.longitude ?? 20.0)
+        print("coordinates: \(curLocStr)")
+        fetchNearestLocation(forId: curLocStr)
         
     }
 }

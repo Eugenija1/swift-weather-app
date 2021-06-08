@@ -28,23 +28,31 @@ struct WeatherRecordView: View{
     let VSTACK_X_OFFSET: CGFloat = -20
     var record: WeatherModel.WeatherRecord
     var viewModel: WeatherViewModel
-    @State private var region : MKCoordinateRegion
+    //@State private var region : MKCoordinateRegion
         //MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 50.0, longitude:20.0), span: MKCoordinateSpan(latitudeDelta: 1, longitudeDelta: 1))
     @State private var showingSheet: Bool = false
-    @State private var places: [Place]
+    //@State private var places: [Place]
         //[Place(coordinate: .init(latitude: 50.0, longitude: 20.0))]
     
     init(record1: WeatherModel.WeatherRecord, viewModel1: WeatherViewModel) {
         record = record1
         viewModel = viewModel1
-        _region = State(initialValue: MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: record.latt, longitude: record.long), span: MKCoordinateSpan(latitudeDelta: 1, longitudeDelta: 1)))
-        _places = State(initialValue: [Place(coordinate: .init(latitude: record.latt, longitude: record.long))])
+        //_region = State(initialValue: MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: record.latt, longitude: record.long), span: MKCoordinateSpan(latitudeDelta: 1, longitudeDelta: 1)))
+       // _places = State(initialValue: [Place(coordinate: .init(latitude: record.latt, longitude: record.long))])
     }
     
-    //struct SheetView {
-   //     @State var region: MKCoordinateRegion
-    //    @State
-    //}
+    struct SheetView: View {
+        
+        var cityName: String
+        @State var region: MKCoordinateRegion
+        
+        var body: some View{
+            VStack{
+                Text(cityName)
+                Map(coordinateRegion: $region)
+            }
+        }
+    }
     
     var body: some View{
         
@@ -77,22 +85,21 @@ struct WeatherRecordView: View{
                 Text("🔎")
                     .font(.largeTitle)
                     .onTapGesture{
-                        setCoordinates(latt: record.latt, long: record.long)
+                     //   setCoordinates(latt: record.latt, long: record.long)
                         showingSheet = true
                         }
-                    .sheet(isPresented: $showingSheet, content:{
-                        VStack{
-                            Text("\(record.cityName)")
-                        
-                       Map(coordinateRegion: $region,annotationItems: places )
-                            {place in MapPin(coordinate: place.coordinate)}
-                        .onAppear(perform: {setCoordinates(latt: record.latt, long: record.long)})
-                            
-                    }
                     //.sheet(isPresented: $showingSheet){
-                    //    SheetView(region: MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: record.latt ?? 20.0, longitude: record.long ?? 50.0), span: MKCoordinateSpan(latitudeDelta: 1.0, longitudeDelta: 1.0)))
+                        //VStack{
+                          //  Text("\(record.cityName)")
+                        
+                      // Map(coordinateRegion: $region,annotationItems: places )
+                       //     {place in MapPin(coordinate: place.coordinate)}
+                       // .onAppear(perform: {setCoordinates(latt: record.latt, long: record.long)})
+                            
                     //}
-            })
+                    .sheet(isPresented: $showingSheet){
+                        SheetView(cityName: record.cityName, region: MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: record.latt ?? 50.0, longitude: record.long ?? 20.0), span: MKCoordinateSpan(latitudeDelta: 1.0, longitudeDelta: 1.0)))
+            }
                     .frame(alignment: .trailing)
                     .padding(.trailing, 5)
             }
@@ -101,11 +108,11 @@ struct WeatherRecordView: View{
         //using .frame modifier to set height of element
       
     }
-    func setCoordinates(latt: Double, long: Double){
-        region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: latt, longitude: long), span: MKCoordinateSpan(latitudeDelta: 1, longitudeDelta: 1))
+    //func setCoordinates(latt: Double, long: Double){
+    //    region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: latt, longitude: long), span: MKCoordinateSpan(latitudeDelta: 1, longitudeDelta: 1))
         
-        print(region.center)
-    }
+     //   print(region.center)
+    //}
 }
 
 
